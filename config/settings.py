@@ -76,14 +76,21 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
 import os
+from urllib.parse import urlparse
 
-import dj_database_url
-
-DATABASE_URL = os.environ.get('DATABASE_URL')
+DATABASE_URL = os.environ.get('DATABASE_URL', '')
 
 if DATABASE_URL:
+    parsed = urlparse(DATABASE_URL)
     DATABASES = {
-        'default': dj_database_url.config(default=DATABASE_URL)
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': parsed.path[1:],
+            'USER': parsed.username,
+            'PASSWORD': parsed.password,
+            'HOST': parsed.hostname,
+            'PORT': parsed.port or 3306,
+        }
     }
 else:
     DATABASES = {
@@ -96,7 +103,6 @@ else:
             'PORT': os.environ.get('MYSQL_PORT', '3306'),
         }
     }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators
