@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Track Order - FoodieExpress</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Poppins', sans-serif; background: #fff8f5; }
+    nav {
+      background: linear-gradient(135deg, #ff5722, #ff9800);
+      padding: 1rem 2rem; display: flex;
+      justify-content: space-between; align-items: center;
+      box-shadow: 0 4px 15px rgba(255,87,34,0.4);
+    }
+    .logo { font-size: 1.8rem; font-weight: 900; color: white; text-decoration: none; }
+    .logo span { color: #fff176; }
+    .nav-links a { color: white; text-decoration: none; margin-left: 1.5rem; font-weight: 600; }
+
+    .container { max-width: 700px; margin: 3rem auto; padding: 0 2rem; }
+    h1 { font-size: 2rem; font-weight: 900; color: #333; margin-bottom: 2rem; }
+    h1 span { color: #ff5722; }
+
+    .card {
+      background: white; border-radius: 20px;
+      padding: 2rem; margin-bottom: 1.5rem;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+    }
+    .card h2 { font-size: 1.2rem; font-weight: 700; color: #333; margin-bottom: 1.5rem; }
+
+    /* STATUS TRACKER */
+    .tracker { position: relative; padding-left: 2rem; }
+    .tracker::before {
+      content: ''; position: absolute;
+      left: 10px; top: 0; bottom: 0;
+      width: 2px; background: #eee;
+    }
+    .step { position: relative; margin-bottom: 2rem; }
+    .step-dot {
+      width: 22px; height: 22px; border-radius: 50%;
+      border: 3px solid #eee; background: white;
+      position: absolute; left: -2rem; top: 0;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .step.done .step-dot { background: #ff5722; border-color: #ff5722; }
+    .step.active .step-dot { background: #ff9800; border-color: #ff9800; animation: pulse 1.5s infinite; }
+    @keyframes pulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(255,152,0,0.4); }
+      50% { box-shadow: 0 0 0 8px rgba(255,152,0,0); }
+    }
+    .step-content h3 { font-size: 1rem; font-weight: 700; color: #333; }
+    .step-content p { font-size: 0.85rem; color: #777; margin-top: 0.2rem; }
+    .step.done .step-content h3 { color: #ff5722; }
+
+    .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .info-box { background: #fff8f5; border-radius: 12px; padding: 1rem; }
+    .info-box label { font-size: 0.75rem; color: #999; font-weight: 600; text-transform: uppercase; }
+    .info-box p { font-size: 0.95rem; font-weight: 700; color: #333; margin-top: 0.3rem; }
+
+    .driver-card {
+      background: linear-gradient(135deg, #ff5722, #ff9800);
+      border-radius: 16px; padding: 1.2rem;
+      color: white; display: flex;
+      justify-content: space-between; align-items: center;
+    }
+    .driver-info h3 { font-weight: 700; font-size: 1rem; }
+    .driver-info p { opacity: 0.9; font-size: 0.85rem; }
+    .call-btn {
+      background: white; color: #ff5722;
+      border: none; border-radius: 25px;
+      padding: 0.5rem 1.2rem; font-weight: 700;
+      cursor: pointer; font-family: 'Poppins', sans-serif;
+      text-decoration: none; font-size: 0.9rem;
+    }
+
+    .back-btn {
+      display: inline-block; margin-top: 1rem;
+      background: linear-gradient(135deg, #ff5722, #ff9800);
+      color: white; padding: 0.8rem 2rem;
+      border-radius: 25px; text-decoration: none;
+      font-weight: 700;
+    }
+
+    footer { background: #222; color: #aaa; text-align: center; padding: 2rem; font-size: 0.9rem; margin-top: 3rem; }
+    footer span { color: #ff5722; }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="{% url 'home' %}" class="logo">Foodie<span>Express</span></a>
+  <div class="nav-links">
+    <a href="{% url 'my_orders' %}">My Orders</a>
+    <form method="post" action="{% url 'logout' %}" style="display:inline;">
+  {% csrf_token %}
+  <button type="submit" style="background:none; border:none; color:white;
+    font-family:'Poppins',sans-serif; font-weight:600;
+    font-size:0.95rem; cursor:pointer;">
+    Logout ({{ user.username }})
+  </button>
+</form>
+  </div>
+</nav>
+
+<div class="container">
+  <h1>📍 Track Order <span>#{{ order.id }}</span></h1>
+
+  <!-- STATUS STEPS -->
+  <div class="card">
+    <h2>Order Status</h2>
+    <div class="tracker">
+      {% with status=order.status %}
+      <div class="step {% if status == 'pending' %}active{% elif status != 'pending' %}done{% endif %}">
+        <div class="step-dot">{% if status != 'pending' %}✓{% endif %}</div>
+        <div class="step-content">
+          <h3>Order Placed ✅</h3>
+          <p>Your order has been received</p>
+        </div>
+      </div>
+      <div class="step {% if status == 'confirmed' %}active{% elif status == 'preparing' or status == 'on_the_way' or status == 'delivered' %}done{% endif %}">
+        <div class="step-dot">{% if status == 'preparing' or status == 'on_the_way' or status == 'delivered' %}✓{% endif %}</div>
+        <div class="step-content">
+          <h3>Confirmed 🎉</h3>
+          <p>Restaurant confirmed your order</p>
+        </div>
+      </div>
+      <div class="step {% if status == 'preparing' %}active{% elif status == 'on_the_way' or status == 'delivered' %}done{% endif %}">
+        <div class="step-dot">{% if status == 'on_the_way' or status == 'delivered' %}✓{% endif %}</div>
+        <div class="step-content">
+          <h3>Preparing 👨‍🍳</h3>
+          <p>Your food is being prepared</p>
+        </div>
+      </div>
+      <div class="step {% if status == 'on_the_way' %}active{% elif status == 'delivered' %}done{% endif %}">
+        <div class="step-dot">{% if status == 'delivered' %}✓{% endif %}</div>
+        <div class="step-content">
+          <h3>On The Way 🛵</h3>
+          <p>Driver is heading to you</p>
+        </div>
+      </div>
+      <div class="step {% if status == 'delivered' %}done{% endif %}">
+        <div class="step-dot">{% if status == 'delivered' %}✓{% endif %}</div>
+        <div class="step-content">
+          <h3>Delivered 🎊</h3>
+          <p>Enjoy your meal!</p>
+        </div>
+      </div>
+      {% endwith %}
+    </div>
+  </div>
+
+  <!-- ORDER INFO -->
+  <div class="card">
+    <h2>📋 Order Details</h2>
+    <div class="info-grid">
+      <div class="info-box">
+        <label>Restaurant</label>
+        <p>{{ order.restaurant.name }}</p>
+      </div>
+      <div class="info-box">
+        <label>Total Paid</label>
+        <p>${{ order.total_price }}</p>
+      </div>
+      <div class="info-box">
+        <label>Ordered At</label>
+        <p>{{ order.created_at|date:"H:i, d M Y" }}</p>
+      </div>
+      <div class="info-box">
+        <label>Delivery To</label>
+        <p>{{ order.delivery_address|truncatechars:30 }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- DRIVER -->
+  {% if tracking and tracking.driver_name %}
+  <div class="card">
+    <h2>🛵 Your Driver</h2>
+    <div class="driver-card">
+      <div class="driver-info">
+        <h3>{{ tracking.driver_name }}</h3>
+        <p>{{ tracking.current_location|default:"On the way to you" }}</p>
+      </div>
+      <a href="tel:{{ tracking.driver_phone }}" class="call-btn">📞 Call</a>
+    </div>
+  </div>
+  {% endif %}
+
+  <a href="{% url 'my_orders' %}" class="back-btn">← Back to My Orders</a>
+</div>
+
+<footer>
+  <p>© 2026 <span>FoodieExpress</span>. Made By JUICE999 ❤️ for food lovers.</p>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>My Orders - FoodieExpress</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Poppins', sans-serif; background: #fff8f5; }
+    nav {
+      background: linear-gradient(135deg, #ff5722, #ff9800);
+      padding: 1rem 2rem; display: flex;
+      justify-content: space-between; align-items: center;
+      position: sticky; top: 0; z-index: 100;
+      box-shadow: 0 4px 15px rgba(255,87,34,0.4);
+    }
+    .logo { font-size: 1.8rem; font-weight: 900; color: white; text-decoration: none; }
+    .logo span { color: #fff176; }
+    .nav-links a { color: white; text-decoration: none; margin-left: 1.5rem; font-weight: 600; }
+    .nav-links a:hover { color: #fff176; }
+
+    .page-hero {
+      background: linear-gradient(135deg, #ff5722, #ff9800);
+      padding: 3rem 2rem; text-align: center; color: white;
+    }
+    .page-hero h1 { font-size: 2.5rem; font-weight: 900; }
+    .page-hero p { opacity: 0.9; margin-top: 0.5rem; }
+
+    .container { max-width: 800px; margin: 3rem auto; padding: 0 2rem; }
+
+    .order-card {
+      background: white; border-radius: 20px;
+      padding: 1.5rem; margin-bottom: 1.5rem;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+      transition: transform 0.2s;
+    }
+    .order-card:hover { transform: translateY(-4px); }
+    .order-header {
+      display: flex; justify-content: space-between;
+      align-items: center; margin-bottom: 1rem;
+      padding-bottom: 1rem; border-bottom: 2px solid #fff8f5;
+    }
+    .order-id { font-size: 1.1rem; font-weight: 800; color: #333; }
+    .order-id span { color: #ff5722; }
+
+    .status-badge {
+      padding: 0.3rem 1rem; border-radius: 20px;
+      font-size: 0.8rem; font-weight: 700;
+    }
+    .status-pending { background: #fff3e0; color: #e65100; }
+    .status-confirmed { background: #e3f2fd; color: #1565c0; }
+    .status-preparing { background: #fce4ec; color: #880e4f; }
+    .status-on_the_way { background: #f3e5f5; color: #6a1b9a; }
+    .status-delivered { background: #e8f5e9; color: #2e7d32; }
+    .status-cancelled { background: #ffebee; color: #c62828; }
+
+    .order-meta { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1rem; }
+    .meta-item label { font-size: 0.75rem; color: #999; font-weight: 600; text-transform: uppercase; }
+    .meta-item p { font-size: 0.9rem; font-weight: 700; color: #333; margin-top: 0.2rem; }
+
+    .order-items { color: #777; font-size: 0.85rem; margin-bottom: 1rem; }
+
+    .order-actions { display: flex; gap: 1rem; }
+    .btn-track {
+      background: linear-gradient(135deg, #ff5722, #ff9800);
+      color: white; padding: 0.6rem 1.5rem;
+      border-radius: 25px; text-decoration: none;
+      font-weight: 700; font-size: 0.9rem;
+    }
+    .btn-reorder {
+      background: white; color: #ff5722;
+      border: 2px solid #ff5722;
+      padding: 0.6rem 1.5rem; border-radius: 25px;
+      text-decoration: none; font-weight: 700; font-size: 0.9rem;
+    }
+
+    .empty { text-align: center; padding: 5rem 2rem; }
+    .empty h3 { font-size: 1.5rem; color: #333; margin-bottom: 0.5rem; }
+    .empty p { color: #777; margin-bottom: 2rem; }
+    .empty a {
+      background: linear-gradient(135deg, #ff5722, #ff9800);
+      color: white; padding: 0.9rem 2.5rem;
+      border-radius: 50px; text-decoration: none; font-weight: 700;
+    }
+
+    footer { background: #222; color: #aaa; text-align: center; padding: 2rem; font-size: 0.9rem; margin-top: 3rem; }
+    footer span { color: #ff5722; }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="{% url 'home' %}" class="logo">Foodie<span>Express</span></a>
+  <div class="nav-links">
+    <a href="{% url 'home' %}">Home</a>
+    <a href="{% url 'restaurant_list' %}">Restaurants</a>
+    <form method="post" action="{% url 'logout' %}" style="display:inline;">
+  {% csrf_token %}
+  <button type="submit" style="background:none; border:none; color:white;
+    font-family:'Poppins',sans-serif; font-weight:600;
+    font-size:0.95rem; cursor:pointer;">
+    Logout ({{ user.username }})
+  </button>
+</form>
+  </div>
+</nav>
+
+<div class="page-hero">
+  <h1>📦 My Orders</h1>
+  <p>Track and manage all your orders, {{ user.username }}</p>
+</div>
+
+<div class="container">
+  {% if messages %}
+    {% for message in messages %}
+      <div style="background:#e8f5e9;color:#2e7d32;padding:1rem;border-radius:12px;margin-bottom:1rem;font-weight:600;">
+        ✅ {{ message }}
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  {% if orders %}
+    {% for order in orders %}
+      <div class="order-card">
+        <div class="order-header">
+          <div class="order-id">Order <span>#{{ order.id }}</span> — {{ order.restaurant.name }}</div>
+          <span class="status-badge status-{{ order.status }}">
+            {% if order.status == 'pending' %}⏳ Pending
+            {% elif order.status == 'confirmed' %}✅ Confirmed
+            {% elif order.status == 'preparing' %}👨‍🍳 Preparing
+            {% elif order.status == 'on_the_way' %}🛵 On The Way
+            {% elif order.status == 'delivered' %}🎊 Delivered
+            {% elif order.status == 'cancelled' %}❌ Cancelled
+            {% endif %}
+          </span>
+        </div>
+
+        <div class="order-meta">
+          <div class="meta-item">
+            <label>Date</label>
+            <p>{{ order.created_at|date:"d M Y" }}</p>
+          </div>
+          <div class="meta-item">
+            <label>Total</label>
+            <p>${{ order.total_price }}</p>
+          </div>
+          <div class="meta-item">
+            <label>Items</label>
+            <p>{{ order.items.count }} item(s)</p>
+          </div>
+        </div>
+
+        <div class="order-items">
+          🍽️
+          {% for item in order.items.all %}
+            {{ item.menu_item.name }} x{{ item.quantity }}{% if not forloop.last %}, {% endif %}
+          {% endfor %}
+        </div>
+
+        <div class="order-actions">
+          <a href="{% url 'track_order' order.id %}" class="btn-track">📍 Track Order</a>
+          <a href="{% url 'restaurant_detail' order.restaurant.pk %}" class="btn-reorder">🔄 Reorder</a>
+        </div>
+      </div>
+    {% endfor %}
+  {% else %}
+    <div class="empty">
+      <p style="font-size:4rem;">🍽️</p>
+      <h3>No orders yet!</h3>
+      <p>Looks like you haven't ordered anything. Let's fix that!</p>
+      <a href="{% url 'restaurant_list' %}">Browse Restaurants →</a>
+    </div>
+  {% endif %}
+</div>
+
+<footer>
+  <p>© 2026 <span>FoodieExpress</span>. Made By JUICE999 ❤️ for food lovers.</p>
+</footer>
+
+</body>
+</html>

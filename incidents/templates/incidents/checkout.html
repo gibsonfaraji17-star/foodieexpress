@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Checkout - FoodieExpress</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Poppins', sans-serif; background: #fff8f5; min-height: 100vh; }
+    nav {
+      background: linear-gradient(135deg, #ff5722, #ff9800);
+      padding: 1rem 2rem; display: flex;
+      justify-content: space-between; align-items: center;
+      box-shadow: 0 4px 15px rgba(255,87,34,0.4);
+    }
+    .logo { font-size: 1.8rem; font-weight: 900; color: white; text-decoration: none; }
+    .logo span { color: #fff176; }
+    .nav-links a { color: white; text-decoration: none; margin-left: 1.5rem; font-weight: 600; }
+
+    .container { max-width: 800px; margin: 3rem auto; padding: 0 2rem; }
+    h1 { font-size: 2rem; font-weight: 900; color: #333; margin-bottom: 2rem; }
+    h1 span { color: #ff5722; }
+
+    .card {
+      background: white; border-radius: 20px;
+      padding: 2rem; margin-bottom: 1.5rem;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+    }
+    .card h2 { font-size: 1.2rem; font-weight: 700; color: #333; margin-bottom: 1.2rem; padding-bottom: 0.8rem; border-bottom: 2px solid #fff8f5; }
+
+    .order-item {
+      display: flex; justify-content: space-between;
+      align-items: center; padding: 0.8rem 0;
+      border-bottom: 1px solid #f5f5f5;
+    }
+    .order-item:last-child { border-bottom: none; }
+    .item-name { font-weight: 600; color: #333; }
+    .item-qty { color: #777; font-size: 0.85rem; }
+    .item-price { color: #ff5722; font-weight: 700; }
+
+    .total-row {
+      display: flex; justify-content: space-between;
+      align-items: center; margin-top: 1rem;
+      padding-top: 1rem; border-top: 2px solid #ff5722;
+    }
+    .total-label { font-size: 1.1rem; font-weight: 700; color: #333; }
+    .total-amount { font-size: 1.4rem; font-weight: 900; color: #ff5722; }
+
+    .address-box {
+      background: #fff8f5; border-radius: 12px;
+      padding: 1rem; color: #555; font-size: 0.95rem;
+    }
+    .address-box strong { color: #333; }
+
+    /* PAYMENT */
+    .payment-methods { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1.5rem; }
+    .payment-option { display: none; }
+    .payment-label {
+      border: 2px solid #eee; border-radius: 14px;
+      padding: 1.2rem 0.5rem; text-align: center;
+      cursor: pointer; transition: all 0.2s; font-weight: 600; color: #555;
+    }
+    .payment-label .icon { font-size: 2rem; display: block; margin-bottom: 0.4rem; }
+    .payment-option:checked + .payment-label {
+      border-color: #ff5722; background: #fff8f5; color: #ff5722;
+    }
+
+    .pay-btn {
+      width: 100%; padding: 1.1rem;
+      background: linear-gradient(135deg, #ff5722, #ff9800);
+      color: white; border: none; border-radius: 14px;
+      font-size: 1.1rem; font-weight: 700;
+      font-family: 'Poppins', sans-serif; cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .pay-btn:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(255,87,34,0.4); }
+
+    footer { background: #222; color: #aaa; text-align: center; padding: 2rem; font-size: 0.9rem; margin-top: 3rem; }
+    footer span { color: #ff5722; }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="{% url 'home' %}" class="logo">Foodie<span>Express</span></a>
+  <div class="nav-links">
+    <a href="{% url 'my_orders' %}">My Orders</a>
+    <form method="post" action="{% url 'logout' %}" style="display:inline;">
+  {% csrf_token %}
+  <button type="submit" style="background:none; border:none; color:white;
+    font-family:'Poppins',sans-serif; font-weight:600;
+    font-size:0.95rem; cursor:pointer;">
+    Logout ({{ user.username }})
+  </button>
+</form>
+  </div>
+</nav>
+
+<div class="container">
+  <h1>🛒 Checkout — Order <span>#{{ order.id }}</span></h1>
+
+  <!-- ORDER SUMMARY -->
+  <div class="card">
+    <h2>📋 Order Summary — {{ order.restaurant.name }}</h2>
+    {% for item in order.items.all %}
+      <div class="order-item">
+        <div>
+          <div class="item-name">{{ item.menu_item.name }}</div>
+          <div class="item-qty">x{{ item.quantity }}</div>
+        </div>
+        <div class="item-price">${{ item.get_total }}</div>
+      </div>
+    {% endfor %}
+    <div class="total-row">
+      <span class="total-label">Total</span>
+      <span class="total-amount">${{ order.total_price }}</span>
+    </div>
+  </div>
+
+  <!-- DELIVERY ADDRESS -->
+  <div class="card">
+    <h2>📍 Delivery Address</h2>
+    <div class="address-box">
+      <strong>Delivering to:</strong><br>{{ order.delivery_address }}
+    </div>
+  </div>
+
+  <!-- PAYMENT -->
+<div class="card">
+  <h2>💳 Choose Payment Method</h2>
+
+  <!-- Card & Mobile Money via Flutterwave -->
+  <div class="payment-methods">
+    <div>
+      <input type="radio" name="payment_method" id="card"
+        value="card" class="payment-option" checked>
+      <label for="card" class="payment-label">
+        <span class="icon">💳</span> Card
+      </label>
+    </div>
+    <div>
+      <input type="radio" name="payment_method" id="mobile"
+        value="mobile_money" class="payment-option">
+      <label for="mobile" class="payment-label">
+        <span class="icon">📱</span> Mobile Money
+      </label>
+    </div>
+    <div>
+      <input type="radio" name="payment_method" id="cash"
+        value="cash" class="payment-option">
+      <label for="cash" class="payment-label">
+        <span class="icon">💵</span> Cash
+      </label>
+    </div>
+  </div>
+
+  <!-- Flutterwave pays card & mobile money -->
+  <div id="online-pay">
+    <button type="button" onclick="makePayment()" class="pay-btn">
+      Pay ${{ order.total_price }} Online 🔒
+    </button>
+  </div>
+
+  <!-- Cash on delivery -->
+  <div id="cash-pay" style="display:none;">
+    <form method="post" action="{% url 'process_payment' order.id %}">
+      {% csrf_token %}
+      <input type="hidden" name="payment_method" value="cash">
+      <button type="submit" class="pay-btn">
+        Confirm Cash on Delivery 💵
+      </button>
+    </form>
+  </div>
+</div>
+
+<script src="https://checkout.flutterwave.com/v3.js"></script>
+<script>
+  // Store Django values in JS variables first
+  var FW_PUBLIC_KEY = "{{ flutterwave_public_key }}";
+  var ORDER_ID = "{{ order.id }}";
+  var ORDER_AMOUNT = parseFloat("{{ order.total_price }}");
+  var USER_EMAIL = "{{ request.user.email|default:'customer@foodieexpress.com' }}";
+  var USER_NAME = "{{ request.user.username }}";
+  var ORDER_REF = "foodie_order_" + ORDER_ID + "_" + Date.now();
+  var selectedMethod = "card";
+
+  // Switch between cash and online
+  document.querySelectorAll(".payment-option").forEach(function(radio) {
+    radio.addEventListener("change", function() {
+      selectedMethod = this.value;
+      if (this.value === "cash") {
+        document.getElementById("cash-pay").style.display = "block";
+        document.getElementById("online-pay").style.display = "none";
+      } else {
+        document.getElementById("cash-pay").style.display = "none";
+        document.getElementById("online-pay").style.display = "block";
+      }
+    });
+  });
+
+  function makePayment() {
+    FlutterwaveCheckout({
+      public_key: FW_PUBLIC_KEY,
+      tx_ref: ORDER_REF,
+      amount: ORDER_AMOUNT,
+      currency: "USD",
+      payment_options: "card, mobilemoney",
+      customer: {
+        email: USER_EMAIL,
+        name: USER_NAME,
+      },
+      customizations: {
+        title: "FoodieExpress",
+        description: "Payment for Order #" + ORDER_ID,
+        logo: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=100",
+      },
+      callback: function(response) {
+        if (response.status === "successful" || response.status === "completed") {
+          window.location.href = "/payment/verify/" + ORDER_ID
+            + "/?transaction_id=" + response.transaction_id
+            + "&payment_method=" + selectedMethod;
+        } else {
+          alert("Payment was not completed. Please try again.");
+        }
+      },
+      onclose: function() {
+        console.log("Payment popup closed");
+      }
+    });
+  }
+</script>
+  // Show/hide cash vs online payment
+  document.querySelectorAll('.payment-option').forEach(function(radio) {
+    radio.addEventListener('change', function() {
+      if (this.value === 'cash') {
+        document.getElementById('cash-pay').style.display = 'block';
+        document.getElementById('online-pay').style.display = 'none';
+      } else {
+        document.getElementById('cash-pay').style.display = 'none';
+        document.getElementById('online-pay').style.display = 'block';
+      }
+    });
+  });
+
+  function makePayment() {
+    FlutterwaveCheckout({
+      public_key: "{{ flutterwave_public_key }}",
+      tx_ref: "order_{{ order.id }}_" + Date.now(),
+      amount: {{ order.total_price }},
+      currency: "USD",
+      payment_options: "card, mobilemoney",
+      customer: {
+        email: "{{ request.user.email }}",
+        name: "{{ request.user.username }}",
+      },
+      customizations: {
+        title: "FoodieExpress",
+        description: "Payment for Order #{{ order.id }}",
+        logo: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=100",
+      },
+      callback: function(response) {
+        if (response.status === "successful") {
+          // Send confirmation to Django
+          window.location.href = "/payment/verify/{{ order.id }}/?tx_ref=" + response.tx_ref + "&transaction_id=" + response.transaction_id;
+        }
+      },
+      onclose: function() {
+        console.log("Payment cancelled");
+      }
+    });
+  }
+</script>
+
+<footer>
+  <p>© 2026 <span>FoodieExpress</span>. Made By JUICE999 ❤️ for food lovers.</p>
+</footer>
+
+</body>
+</html>

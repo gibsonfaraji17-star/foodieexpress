@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FoodieExpress - Fast Food Delivery</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Poppins', sans-serif; background: #fff; }
+
+    /* NAVBAR */
+    nav {
+      background: linear-gradient(135deg, #ff5722, #ff9800);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 4px 15px rgba(255,87,34,0.4);
+    }
+    .logo {
+      font-size: 1.8rem;
+      font-weight: 900;
+      color: white;
+      letter-spacing: 1px;
+    }
+    .logo span { color: #fff176; }
+    .nav-links a {
+      color: white;
+      text-decoration: none;
+      margin-left: 1.5rem;
+      font-weight: 600;
+      font-size: 0.95rem;
+      transition: color 0.3s;
+    }
+    .nav-links a:hover { color: #fff176; }
+    .nav-btn {
+      background: white;
+      color: #ff5722 !important;
+      padding: 0.4rem 1.2rem;
+      border-radius: 25px;
+      font-weight: 700 !important;
+    }
+    .nav-btn:hover { background: #fff176; color: #ff5722 !important; }
+
+    /* HERO */
+    .hero {
+      min-height: 90vh;
+      background: linear-gradient(rgba(0,0,0,0.55), rgba(0,0,0,0.55)),
+        url('https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=1400') center/cover no-repeat;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 2rem;
+    }
+    .hero h1 {
+      font-size: 4rem;
+      font-weight: 900;
+      color: white;
+      line-height: 1.1;
+      text-shadow: 2px 4px 10px rgba(0,0,0,0.5);
+    }
+    .hero h1 span { color: #ff9800; }
+    .hero p {
+      font-size: 1.3rem;
+      color: #f0f0f0;
+      margin: 1.2rem 0 2rem;
+      max-width: 550px;
+    }
+    .hero-btns { display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; }
+    .btn-primary {
+      background: linear-gradient(135deg, #ff5722, #ff9800);
+      color: white;
+      padding: 0.9rem 2.5rem;
+      border-radius: 50px;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 1.1rem;
+      box-shadow: 0 6px 20px rgba(255,87,34,0.5);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 10px 25px rgba(255,87,34,0.6); }
+    .btn-outline {
+      border: 2px solid white;
+      color: white;
+      padding: 0.9rem 2.5rem;
+      border-radius: 50px;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 1.1rem;
+      transition: all 0.2s;
+    }
+    .btn-outline:hover { background: white; color: #ff5722; }
+
+    /* FEATURES */
+    .features {
+      padding: 5rem 2rem;
+      background: #fff8f5;
+      text-align: center;
+    }
+    .section-title {
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: #333;
+      margin-bottom: 0.5rem;
+    }
+    .section-title span { color: #ff5722; }
+    .section-sub { color: #777; margin-bottom: 3rem; font-size: 1.05rem; }
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 2rem;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+    .feature-card {
+      background: white;
+      border-radius: 20px;
+      padding: 2rem;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+      transition: transform 0.3s;
+    }
+    .feature-card:hover { transform: translateY(-8px); }
+    .feature-icon { font-size: 3rem; margin-bottom: 1rem; }
+    .feature-card h3 { font-size: 1.2rem; font-weight: 700; color: #333; margin-bottom: 0.5rem; }
+    .feature-card p { color: #777; font-size: 0.9rem; }
+
+    /* FOOD GRID */
+    .food-section {
+      padding: 5rem 2rem;
+      text-align: center;
+      background: white;
+    }
+    .food-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 2rem;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    .food-card {
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+      transition: transform 0.3s;
+      background: white;
+    }
+    .food-card:hover { transform: translateY(-8px); }
+    .food-card img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+    }
+    .food-card-body { padding: 1.2rem; text-align: left; }
+    .food-card-body h3 { font-size: 1.1rem; font-weight: 700; color: #333; }
+    .food-card-body p { color: #777; font-size: 0.85rem; margin: 0.3rem 0 0.8rem; }
+    .food-card-body .price { color: #ff5722; font-weight: 800; font-size: 1.1rem; }
+    .order-btn {
+      background: linear-gradient(135deg, #ff5722, #ff9800);
+      color: white;
+      border: none;
+      padding: 0.5rem 1.5rem;
+      border-radius: 25px;
+      font-weight: 600;
+      cursor: pointer;
+      float: right;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    /* CTA */
+    .cta {
+      padding: 5rem 2rem;
+      background: linear-gradient(135deg, #ff5722, #ff9800);
+      text-align: center;
+      color: white;
+    }
+    .cta h2 { font-size: 2.5rem; font-weight: 800; margin-bottom: 1rem; }
+    .cta p { font-size: 1.1rem; margin-bottom: 2rem; opacity: 0.9; }
+    .btn-white {
+      background: white;
+      color: #ff5722;
+      padding: 0.9rem 2.5rem;
+      border-radius: 50px;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 1.1rem;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+      transition: transform 0.2s;
+    }
+    .btn-white:hover { transform: translateY(-3px); }
+
+    /* FOOTER */
+    footer {
+      background: #222;
+      color: #aaa;
+      text-align: center;
+      padding: 2rem;
+      font-size: 0.9rem;
+    }
+    footer span { color: #ff5722; }
+  </style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav>
+  <div class="logo">Foodie<span>Express</span></div>
+  <div class="nav-links">
+    <a href="{% url 'home' %}">Home</a>
+    <a href="{% url 'restaurant_list' %}">Restaurants</a>
+    <a href="#restaurants">Offers</a>
+    <a href="#">Contact</a>
+    {% if user.is_authenticated %}
+      <form method="post" action="{% url 'logout' %}" style="display:inline;">
+  {% csrf_token %}
+  <button type="submit" style="background:none; border:none; color:white;
+    font-family:'Poppins',sans-serif; font-weight:600;
+    font-size:0.95rem; cursor:pointer;">
+    Logout ({{ user.username }})
+  </button>
+</form>
+    {% else %}
+      <a href="{% url 'login' %}">Login</a>
+      <a href="{% url 'register' %}" class="nav-btn">Sign Up</a>
+    {% endif %}
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <h1>Hungry? <br><span>We've Got You</span> Covered 🍔</h1>
+  <p>Order from the best local restaurants and get hot food delivered to your door in minutes.</p>
+  <div class="hero-btns">
+    <a href="{% url 'register' %}" class="btn-primary">Order Now 🚀</a>
+    <a href="{% url 'restaurant_list' %}" class="btn-outline">See Restaurants</a>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="features">
+  <h2 class="section-title">Why Choose <span>FoodieExpress?</span></h2>
+  <p class="section-sub">We make ordering food fast, easy, and delicious</p>
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="feature-icon">⚡</div>
+      <h3>Lightning Fast</h3>
+      <p>Average delivery time of just 25 minutes. Hot food, every time.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🍽️</div>
+      <h3>100+ Restaurants</h3>
+      <p>Choose from hundreds of local restaurants and cuisines.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">💳</div>
+      <h3>Easy Payment</h3>
+      <p>Pay securely online with card, mobile money, or cash on delivery.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">📍</div>
+      <h3>Live Tracking</h3>
+      <p>Track your order in real-time from kitchen to your doorstep.</p>
+    </div>
+  </div>
+</section>
+
+<!-- FOOD MENU -->
+<section class="food-section" id="menu">
+  <h2 class="section-title">🔥 Popular <span>Right Now</span></h2>
+  <p class="section-sub">Fresh, hot, and ready to order</p>
+  <div class="food-grid">
+    <div class="food-card">
+      <img src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=500" alt="Burger">
+      <div class="food-card-body">
+        <h3>Classic Smash Burger</h3>
+        <p>Juicy beef patty, cheddar, lettuce, tomato & special sauce</p>
+        <span class="price">$8.99</span>
+        <button class="order-btn">Add 🛒</button>
+      </div>
+    </div>
+    <div class="food-card">
+      <img src="https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=500" alt="Pizza">
+      <div class="food-card-body">
+        <h3>Margherita Pizza</h3>
+        <p>Fresh mozzarella, tomato basil sauce on a crispy thin crust</p>
+        <span class="price">$11.99</span>
+        <button class="order-btn">Add 🛒</button>
+      </div>
+    </div>
+    <div class="food-card">
+      <img src="https://images.unsplash.com/photo-1569050467447-ce54b3bbc37d?w=500" alt="Sushi">
+      <div class="food-card-body">
+        <h3>Sushi Platter</h3>
+        <p>12-piece assorted sushi with wasabi, ginger & soy sauce</p>
+        <span class="price">$16.99</span>
+        <button class="order-btn">Add 🛒</button>
+      </div>
+    </div>
+    <div class="food-card">
+      <img src="https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=500" alt="Salad">
+      <div class="food-card-body">
+        <h3>Fresh Garden Salad</h3>
+        <p>Mixed greens, cherry tomatoes, cucumber & honey mustard</p>
+        <span class="price">$7.43</span>
+        <button class="order-btn">Add 🛒</button>
+      </div>
+    </div>
+    <div class="food-card">
+      <img src="https://images.unsplash.com/photo-1563379926898-05f4575a45d8?w=500" alt="Pasta">
+      <div class="food-card-body">
+        <h3>Creamy Pasta</h3>
+        <p>Fettuccine in rich alfredo sauce with grilled chicken</p>
+        <span class="price">$.12.99</span>
+        <button class="order-btn">Add 🛒</button>
+      </div>
+    </div>
+    <div class="food-card">
+      <img src="https://images.unsplash.com/photo-1551024709-8f23befc6f87?w=500" alt="Dessert">
+      <div class="food-card-body">
+        <h3>Chocolate Lava Cake</h3>
+        <p>Warm chocolate cake with molten centre & vanilla ice cream</p>
+        <span class="price">$5.99</span>
+        <button class="order-btn">Add 🛒</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta">
+  <h2>Ready to Order? 🍕</h2>
+  <p>Create a free account and get your first delivery fee waived!</p>
+  <a href="{% url 'register' %}" class="btn-white">Get Started Free →</a>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <p>© 2026 <span>FoodieExpress</span>. Made By JUICE999 for food lovers.</p>
+</footer>
+
+</body>
+</html>

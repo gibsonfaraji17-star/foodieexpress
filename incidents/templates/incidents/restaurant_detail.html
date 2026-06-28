@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{{ restaurant.name }} - FoodieExpress</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Poppins', sans-serif; background: #fff8f5; }
+    nav {
+      background: linear-gradient(135deg, #ff5722, #ff9800);
+      padding: 1rem 2rem; display: flex;
+      justify-content: space-between; align-items: center;
+      position: sticky; top: 0; z-index: 100;
+      box-shadow: 0 4px 15px rgba(255,87,34,0.4);
+    }
+    .logo { font-size: 1.8rem; font-weight: 900; color: white; text-decoration: none; }
+    .logo span { color: #fff176; }
+    .nav-links a { color: white; text-decoration: none; margin-left: 1.5rem; font-weight: 600; }
+    .nav-links a:hover { color: #fff176; }
+    .nav-btn { background: white; color: #ff5722 !important; padding: 0.4rem 1.2rem; border-radius: 25px; font-weight: 700 !important; }
+
+    .restaurant-hero {
+      height: 300px;
+      background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)),
+        url('{{ restaurant.image_url|default:"https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1400" }}') center/cover;
+      display: flex; align-items: flex-end; padding: 2rem;
+    }
+    .restaurant-hero-info { color: white; }
+    .restaurant-hero-info h1 { font-size: 2.5rem; font-weight: 900; }
+    .restaurant-hero-info p { opacity: 0.9; margin-top: 0.3rem; }
+    .meta-pills { display: flex; gap: 1rem; margin-top: 0.8rem; flex-wrap: wrap; }
+    .pill {
+      background: rgba(255,255,255,0.2);
+      padding: 0.3rem 1rem; border-radius: 20px;
+      font-size: 0.85rem; font-weight: 600;
+    }
+
+    .container { max-width: 1100px; margin: 0 auto; padding: 2rem; display: grid; grid-template-columns: 1fr 350px; gap: 2rem; }
+    @media(max-width: 768px) { .container { grid-template-columns: 1fr; } }
+
+    .menu-section h2 { font-size: 1.6rem; font-weight: 800; color: #333; margin-bottom: 1.5rem; }
+    .menu-section h2 span { color: #ff5722; }
+
+    .menu-item {
+      background: white; border-radius: 16px;
+      padding: 1.2rem; margin-bottom: 1rem;
+      display: flex; gap: 1rem; align-items: center;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+      transition: transform 0.2s;
+    }
+    .menu-item:hover { transform: translateX(5px); }
+    .menu-item img { width: 90px; height: 90px; object-fit: cover; border-radius: 12px; flex-shrink: 0; }
+    .item-info { flex: 1; }
+    .item-info h3 { font-size: 1rem; font-weight: 700; color: #333; }
+    .item-info p { color: #777; font-size: 0.8rem; margin: 0.2rem 0; }
+    .item-info .price { color: #ff5722; font-weight: 800; font-size: 1rem; }
+    .qty-control { display: flex; align-items: center; gap: 0.5rem; margin-top: 0.5rem; }
+    .qty-btn {
+      width: 28px; height: 28px; border-radius: 50%;
+      border: 2px solid #ff5722; background: white;
+      color: #ff5722; font-weight: 700; font-size: 1rem;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+    }
+    .qty-input {
+      width: 40px; text-align: center; border: 2px solid #eee;
+      border-radius: 8px; padding: 0.2rem; font-family: 'Poppins', sans-serif;
+      font-weight: 600;
+    }
+
+    /* ORDER SUMMARY SIDEBAR */
+    .order-sidebar {
+      position: sticky; top: 80px;
+      background: white; border-radius: 20px;
+      padding: 1.5rem;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+      height: fit-content;
+    }
+    .order-sidebar h3 { font-size: 1.2rem; font-weight: 800; color: #333; margin-bottom: 1rem; }
+    .address-input {
+      width: 100%; padding: 0.8rem;
+      border: 2px solid #eee; border-radius: 12px;
+      font-family: 'Poppins', sans-serif; font-size: 0.9rem;
+      margin-bottom: 1rem; outline: none; resize: none;
+    }
+    .address-input:focus { border-color: #ff5722; }
+    .submit-btn {
+      width: 100%; padding: 1rem;
+      background: linear-gradient(135deg, #ff5722, #ff9800);
+      color: white; border: none; border-radius: 12px;
+      font-size: 1rem; font-weight: 700;
+      font-family: 'Poppins', sans-serif; cursor: pointer;
+      transition: transform 0.2s;
+    }
+    .submit-btn:hover { transform: translateY(-2px); }
+    .login-prompt {
+      text-align: center; padding: 1rem;
+      background: #fff8f5; border-radius: 12px; color: #555;
+    }
+    .login-prompt a { color: #ff5722; font-weight: 700; text-decoration: none; }
+
+    footer { background: #222; color: #aaa; text-align: center; padding: 2rem; font-size: 0.9rem; margin-top: 3rem; }
+    footer span { color: #ff5722; }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="{% url 'home' %}" class="logo">Foodie<span>Express</span></a>
+  <div class="nav-links">
+    <a href="{% url 'home' %}">Home</a>
+    <a href="{% url 'restaurant_list' %}">Restaurants</a>
+    {% if user.is_authenticated %}
+      <a href="{% url 'my_orders' %}">My Orders</a>
+      <form method="post" action="{% url 'logout' %}" style="display:inline;">
+  {% csrf_token %}
+  <button type="submit" style="background:none; border:none; color:white;
+    font-family:'Poppins',sans-serif; font-weight:600;
+    font-size:0.95rem; cursor:pointer; padding:0;">
+    Logout ({{ user.username }})
+  </button>
+</form>
+    {% else %}
+      <a href="{% url 'login' %}">Login</a>
+      <a href="{% url 'register' %}" class="nav-btn">Sign Up</a>
+    {% endif %}
+  </div>
+</nav>
+
+<div class="restaurant-hero">
+  <div class="restaurant-hero-info">
+    <h1>{{ restaurant.name }}</h1>
+    <p>{{ restaurant.description }}</p>
+    <div class="meta-pills">
+      <span class="pill">⭐ {{ restaurant.rating }}</span>
+      <span class="pill">🕐 {{ restaurant.delivery_time }} mins</span>
+      <span class="pill">📍 {{ restaurant.address }}</span>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <!-- MENU -->
+  <div class="menu-section">
+    <h2>Our <span>Menu</span> 🍽️</h2>
+    {% if menu_items %}
+      <form method="post" action="{% url 'place_order' restaurant.pk %}" id="orderForm">
+        {% csrf_token %}
+        {% for item in menu_items %}
+          <div class="menu-item">
+            <img src="{{ item.image_url|default:'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=200' }}" alt="{{ item.name }}">
+            <div class="item-info">
+              <h3>{{ item.name }}</h3>
+              <p>{{ item.description }}</p>
+              <span class="price">${{ item.price }}</span>
+              <div class="qty-control">
+  <button type="button" class="qty-btn"
+    data-id="{{ item.pk }}" data-action="minus">−</button>
+  <input type="number"
+    name="quantities"
+    id="qty_{{ item.pk }}"
+    value="0" min="0" max="10"
+    class="qty-input"
+    data-id="{{ item.pk }}">
+  <button type="button" class="qty-btn"
+    data-id="{{ item.pk }}" data-action="plus">+</button>
+  <input type="hidden" name="item_ids"
+    id="id_{{ item.pk }}" disabled>
+</div>
+            </div>
+          </div>
+        {% endfor %}
+    {% else %}
+      <p style="color:#777;">No menu items available yet.</p>
+    {% endif %}
+  </div>
+
+  <!-- SIDEBAR -->
+  <div class="order-sidebar">
+    <h3>🛒 Your Order</h3>
+    {% if user.is_authenticated %}
+      <textarea name="delivery_address" class="address-input" rows="3"
+        placeholder="Enter your delivery address..." required></textarea>
+      <button type="submit" class="submit-btn" form="orderForm">Place Order 🚀</button>
+      </form>
+    {% else %}
+      <div class="login-prompt">
+        <p>Please <a href="{% url 'login' %}">log in</a> or <a href="{% url 'register' %}">sign up</a> to place an order.</p>
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+<footer>
+  <p>© 2026 <span>FoodieExpress</span>. Made By JUICE999❤️ for food lovers.</p>
+</footer>
+
+<script>
+  // Handle plus/minus buttons
+  document.querySelectorAll('.qty-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var id = this.getAttribute('data-id');
+      var action = this.getAttribute('data-action');
+      var input = document.getElementById('qty_' + id);
+      var val = parseInt(input.value);
+
+      if (action === 'plus' && val < 10) val++;
+      if (action === 'minus' && val > 0) val--;
+
+      input.value = val;
+      updateHidden(id, val);
+    });
+  });
+
+  // Handle manual typing in quantity box
+  document.querySelectorAll('.qty-input').forEach(function(input) {
+    input.addEventListener('change', function() {
+      var id = this.getAttribute('data-id');
+      updateHidden(id, parseInt(this.value));
+    });
+  });
+
+  // Enable/disable hidden input based on quantity
+  function updateHidden(id, val) {
+    var hidden = document.getElementById('id_' + id);
+    if (val > 0) {
+      hidden.disabled = false;
+      hidden.value = id;
+    } else {
+      hidden.disabled = true;
+    }
+  }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Login - FoodieExpress</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;900&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Poppins', sans-serif;
+      min-height: 100vh;
+      background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)),
+        url('https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=1400') center/cover no-repeat;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .card {
+      background: white;
+      border-radius: 24px;
+      padding: 3rem 2.5rem;
+      width: 100%;
+      max-width: 420px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      text-align: center;
+    }
+    .logo { font-size: 2rem; font-weight: 900; color: #ff5722; margin-bottom: 0.3rem; }
+    .logo span { color: #ff9800; }
+    .card h2 { font-size: 1.5rem; font-weight: 700; color: #333; margin-bottom: 0.3rem; }
+    .card p { color: #888; font-size: 0.9rem; margin-bottom: 2rem; }
+    .form-group { margin-bottom: 1.2rem; text-align: left; }
+    label { font-size: 0.85rem; font-weight: 600; color: #555; display: block; margin-bottom: 0.4rem; }
+    input {
+      width: 100%;
+      padding: 0.85rem 1rem;
+      border: 2px solid #eee;
+      border-radius: 12px;
+      font-size: 0.95rem;
+      font-family: 'Poppins', sans-serif;
+      transition: border 0.3s;
+      outline: none;
+    }
+    input:focus { border-color: #ff5722; }
+    .btn {
+      width: 100%;
+      padding: 1rem;
+      background: linear-gradient(135deg, #ff5722, #ff9800);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 700;
+      font-family: 'Poppins', sans-serif;
+      cursor: pointer;
+      margin-top: 0.5rem;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(255,87,34,0.4); }
+    .link { margin-top: 1.5rem; font-size: 0.9rem; color: #777; }
+    .link a { color: #ff5722; font-weight: 600; text-decoration: none; }
+    .errors { background: #ffe5e5; color: #c0392b; padding: 0.8rem; border-radius: 10px; font-size: 0.85rem; margin-bottom: 1rem; }
+  </style>
+</head>
+<body>
+<div class="card">
+  <div class="logo">Foodie<span>Express</span> 🍔</div>
+  <h2>Welcome Back!</h2>
+  <p>Log in to continue ordering your favourite food</p>
+
+  {% if form.errors %}
+    <div class="errors">Invalid username or password. Please try again.</div>
+  {% endif %}
+
+  <form method="post">
+    {% csrf_token %}
+    <div class="form-group">
+      <label>Username</label>
+      <input type="text" name="username" placeholder="Enter your username" required>
+    </div>
+    <div class="form-group">
+      <label>Password</label>
+      <input type="password" name="password" placeholder="Enter your password" required>
+    </div>
+    <button class="btn" type="submit">Login 🚀</button>
+  </form>
+
+  <div class="link">
+    Don't have an account? <a href="{% url 'register' %}">Sign Up Free</a>
+  </div>
+</div>
+</body>
+</html>

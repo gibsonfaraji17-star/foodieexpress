@@ -1,0 +1,181 @@
+[3:34 AM, 6/25/2026] juice999: from django.urls import path
+from . import views
+
+urlpatterns = [
+    # Auth
+    path('', views.home, name='home'),
+    path('register/', views.register, name='register'),
+    path('login/', views.user_login, name='login'),
+    path('logout/', views.user_logout, name='logout'),
+
+    # Restaurants
+    path('restaurants/', views.restaurant_list, name='restaurant_list'),
+    path('restaurants/<int:pk>/', views.restaurant_detail, name='restaurant_detail'),
+
+    # Orders
+    path('order/<int:restaurant_id>/', views.place_order, name='place_order'),
+    path('checkout/<int:order_id>/', views.checkout, name='checkout'),
+    path('payment/<int:order_id>/', views.process_payment, name='process_payment'),
+    path('track/<int:order_id>/', views.track_order, name='track_order'),
+    path('my-orders/', views.my_orders, name='my_orders'),
+]
+[3:45 AM, 6/25/2026] juice999: <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Restaurants - FoodieExpress</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Poppins', sans-serif; background: #fff8f5; }
+    nav {
+      background: linear-gradient(135deg, #ff5722, #ff9800);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 4px 15px rgba(255,87,34,0.4);
+    }
+    .logo { font-size: 1.8rem; font-weight: 900; color: white; text-decoration: none; }
+    .logo span { color: #fff176; }
+    .nav-links a {
+      color: white; text-decoration: none;
+      margin-left: 1.5rem; font-weight: 600; font-size: 0.95rem;
+    }
+    .nav-links a:hover { color: #fff176; }
+    .nav-btn {
+      background: white; color: #ff5722 !important;
+      padding: 0.4rem 1.2rem; border-radius: 25px; font-weight: 700 !important;
+    }
+
+    .page-hero {
+      background: linear-gradient(135deg, #ff5722, #ff9800);
+      padding: 4rem 2rem;
+      text-align: center;
+      color: white;
+    }
+    .page-hero h1 { font-size: 2.8rem; font-weight: 900; }
+    .page-hero p { font-size: 1.1rem; opacity: 0.9; margin-top: 0.5rem; }
+
+    .container { max-width: 1100px; margin: 3rem auto; padding: 0 2rem; }
+    .section-title { font-size: 1.8rem; font-weight: 800; color: #333; margin-bottom: 2rem; }
+    .section-title span { color: #ff5722; }
+
+    .restaurant-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 2rem;
+    }
+    .restaurant-card {
+      background: white;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+      transition: transform 0.3s;
+      text-decoration: none;
+      color: inherit;
+      display: block;
+    }
+    .restaurant-card:hover { transform: translateY(-8px); }
+    .restaurant-card img { width: 100%; height: 200px; object-fit: cover; }
+    .card-body { padding: 1.3rem; }
+    .card-body h3 { font-size: 1.2rem; font-weight: 700; color: #333; }
+    .card-body p { color: #777; font-size: 0.85rem; margin: 0.4rem 0; }
+    .card-meta {
+      display: flex; justify-content: space-between;
+      align-items: center; margin-top: 0.8rem;
+    }
+    .rating { color: #ff9800; font-weight: 700; font-size: 0.95rem; }
+    .delivery-time {
+      background: #fff8f5; color: #ff5722;
+      padding: 0.3rem 0.8rem; border-radius: 20px;
+      font-size: 0.8rem; font-weight: 600;
+    }
+    .order-link {
+      display: block; margin-top: 1rem;
+      background: linear-gradient(135deg, #ff5722, #ff9800);
+      color: white; text-align: center;
+      padding: 0.7rem; border-radius: 12px;
+      font-weight: 700; text-decoration: none;
+      font-size: 0.9rem;
+    }
+
+    .empty { text-align: center; padding: 4rem 2rem; color: #999; }
+    .empty h3 { font-size: 1.5rem; margin-bottom: 0.5rem; }
+
+    footer {
+      background: #222; color: #aaa;
+      text-align: center; padding: 2rem;
+      font-size: 0.9rem; margin-top: 4rem;
+    }
+    footer span { color: #ff5722; }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="{% url 'home' %}" class="logo">Foodie<span>Express</span></a>
+  <div class="nav-links">
+  <a href="{% url 'home' %}">Home</a>
+  <a href="{% url 'restaurant_list' %}">Restaurants</a>
+  {% if user.is_authenticated %}
+    <a href="{% url 'my_orders' %}">My Orders</a>
+    &nbsp;
+    <form method="post" action="{% url 'logout' %}" style="display:inline;">
+      {% csrf_token %}
+      <button type="submit" style="background:none; border:none;
+        color:white; font-family:'Poppins',sans-serif;
+        font-weight:600; font-size:0.95rem; cursor:pointer; padding:0;">
+        Logout ({{ user.username }})
+      </button>
+    </form>
+  {% else %}
+    <a href="{% url 'login' %}">Login</a>
+    <a href="{% url 'register' %}" class="nav-btn">Sign Up</a>
+  {% endif %}
+</div>
+</nav>
+
+<div class="page-hero">
+  <h1>🍽️ All Restaurants</h1>
+  <p>Choose from our top-rated local restaurants</p>
+</div>
+
+<div class="container">
+  <h2 class="section-title">Available <span>Near You</span></h2>
+
+  {% if restaurants %}
+    <div class="restaurant-grid">
+      {% for restaurant in restaurants %}
+        <div class="restaurant-card">
+          <img src="{{ restaurant.image_url|default:'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=500' }}" alt="{{ restaurant.name }}">
+          <div class="card-body">
+            <h3>{{ restaurant.name }}</h3>
+            <p>{{ restaurant.description|truncatechars:80 }}</p>
+            <p>📍 {{ restaurant.address }}</p>
+            <div class="card-meta">
+              <span class="rating">⭐ {{ restaurant.rating }}</span>
+              <span class="delivery-time">🕐 {{ restaurant.delivery_time }} mins</span>
+            </div>
+            <a href="{% url 'restaurant_detail' restaurant.pk %}" class="order-link">View Menu & Order →</a>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="empty">
+      <h3>No restaurants available yet</h3>
+      <p>Check back soon — we're adding more daily!</p>
+    </div>
+  {% endif %}
+</div>
+
+<footer>
+  <p>© 2026 <span>FoodieExpress</span>. Made By JUICE999❤️ for food lovers.</p>
+</footer>
+
+</body>
+</html>
