@@ -133,7 +133,7 @@
 
 <script src="https://checkout.flutterwave.com/v3.js"></script>
 <script>
-  var FW_PUBLIC_KEY = "{{ flutterwave_public_key }}";
+  var FW_PUBLIC_KEY = "FLWPUBK_TEST-51c4d9d90f0f36859b3133fb71e34fc7-X";
   var ORDER_ID = "{{ order.id }}";
   var ORDER_AMOUNT = parseFloat("{{ order.total_price }}");
   var USER_EMAIL = "{{ request.user.email|default:'customer@foodieexpress.com' }}";

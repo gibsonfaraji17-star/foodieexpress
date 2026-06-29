@@ -7,7 +7,7 @@ from .models import Restaurant, MenuItem, Order, OrderItem, Payment, DeliveryTra
 from decimal import Decimal
 import requests
 from django.conf import settings as django_settings
-
+from django.conf import settings
 
 # ---------- AUTH ----------
 def home(request):
