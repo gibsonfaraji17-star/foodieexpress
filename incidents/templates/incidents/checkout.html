@@ -6,7 +6,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;900&display=swap" rel="stylesheet">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Poppins', sans-serif; background: #fff8f5; min-height: 100vh; }
+    body { font-family: 'Poppins', sans-serif; background: #fff8f5; }
     nav {
       background: linear-gradient(135deg, #ff5722, #ff9800);
       padding: 1rem 2rem; display: flex;
@@ -16,65 +16,31 @@
     .logo { font-size: 1.8rem; font-weight: 900; color: white; text-decoration: none; }
     .logo span { color: #fff176; }
     .nav-links a { color: white; text-decoration: none; margin-left: 1.5rem; font-weight: 600; }
-
     .container { max-width: 800px; margin: 3rem auto; padding: 0 2rem; }
     h1 { font-size: 2rem; font-weight: 900; color: #333; margin-bottom: 2rem; }
     h1 span { color: #ff5722; }
-
     .card {
       background: white; border-radius: 20px;
       padding: 2rem; margin-bottom: 1.5rem;
       box-shadow: 0 8px 25px rgba(0,0,0,0.08);
     }
     .card h2 { font-size: 1.2rem; font-weight: 700; color: #333; margin-bottom: 1.2rem; padding-bottom: 0.8rem; border-bottom: 2px solid #fff8f5; }
-
-    .order-item {
-      display: flex; justify-content: space-between;
-      align-items: center; padding: 0.8rem 0;
-      border-bottom: 1px solid #f5f5f5;
-    }
+    .order-item { display: flex; justify-content: space-between; align-items: center; padding: 0.8rem 0; border-bottom: 1px solid #f5f5f5; }
     .order-item:last-child { border-bottom: none; }
     .item-name { font-weight: 600; color: #333; }
     .item-qty { color: #777; font-size: 0.85rem; }
     .item-price { color: #ff5722; font-weight: 700; }
-
-    .total-row {
-      display: flex; justify-content: space-between;
-      align-items: center; margin-top: 1rem;
-      padding-top: 1rem; border-top: 2px solid #ff5722;
-    }
+    .total-row { display: flex; justify-content: space-between; align-items: center; margin-top: 1rem; padding-top: 1rem; border-top: 2px solid #ff5722; }
     .total-label { font-size: 1.1rem; font-weight: 700; color: #333; }
     .total-amount { font-size: 1.4rem; font-weight: 900; color: #ff5722; }
-
-    .address-box {
-      background: #fff8f5; border-radius: 12px;
-      padding: 1rem; color: #555; font-size: 0.95rem;
-    }
-    .address-box strong { color: #333; }
-
-    /* PAYMENT */
+    .address-box { background: #fff8f5; border-radius: 12px; padding: 1rem; color: #555; }
     .payment-methods { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1.5rem; }
     .payment-option { display: none; }
-    .payment-label {
-      border: 2px solid #eee; border-radius: 14px;
-      padding: 1.2rem 0.5rem; text-align: center;
-      cursor: pointer; transition: all 0.2s; font-weight: 600; color: #555;
-    }
+    .payment-label { border: 2px solid #eee; border-radius: 14px; padding: 1.2rem 0.5rem; text-align: center; cursor: pointer; transition: all 0.2s; font-weight: 600; color: #555; display: block; }
     .payment-label .icon { font-size: 2rem; display: block; margin-bottom: 0.4rem; }
-    .payment-option:checked + .payment-label {
-      border-color: #ff5722; background: #fff8f5; color: #ff5722;
-    }
-
-    .pay-btn {
-      width: 100%; padding: 1.1rem;
-      background: linear-gradient(135deg, #ff5722, #ff9800);
-      color: white; border: none; border-radius: 14px;
-      font-size: 1.1rem; font-weight: 700;
-      font-family: 'Poppins', sans-serif; cursor: pointer;
-      transition: transform 0.2s, box-shadow 0.2s;
-    }
-    .pay-btn:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(255,87,34,0.4); }
-
+    .payment-option:checked + .payment-label { border-color: #ff5722; background: #fff8f5; color: #ff5722; }
+    .pay-btn { width: 100%; padding: 1.1rem; background: linear-gradient(135deg, #ff5722, #ff9800); color: white; border: none; border-radius: 14px; font-size: 1.1rem; font-weight: 700; font-family: 'Poppins', sans-serif; cursor: pointer; transition: transform 0.2s; }
+    .pay-btn:hover { transform: translateY(-3px); }
     footer { background: #222; color: #aaa; text-align: center; padding: 2rem; font-size: 0.9rem; margin-top: 3rem; }
     footer span { color: #ff5722; }
   </style>
@@ -86,20 +52,17 @@
   <div class="nav-links">
     <a href="{% url 'my_orders' %}">My Orders</a>
     <form method="post" action="{% url 'logout' %}" style="display:inline;">
-  {% csrf_token %}
-  <button type="submit" style="background:none; border:none; color:white;
-    font-family:'Poppins',sans-serif; font-weight:600;
-    font-size:0.95rem; cursor:pointer;">
-    Logout ({{ user.username }})
-  </button>
-</form>
+      {% csrf_token %}
+      <button type="submit" style="background:none; border:none; color:white; font-family:'Poppins',sans-serif; font-weight:600; font-size:0.95rem; cursor:pointer; padding:0;">
+        Logout
+      </button>
+    </form>
   </div>
 </nav>
 
 <div class="container">
   <h1>🛒 Checkout — Order <span>#{{ order.id }}</span></h1>
 
-  <!-- ORDER SUMMARY -->
   <div class="card">
     <h2>📋 Order Summary — {{ order.restaurant.name }}</h2>
     {% for item in order.items.all %}
@@ -117,7 +80,6 @@
     </div>
   </div>
 
-  <!-- DELIVERY ADDRESS -->
   <div class="card">
     <h2>📍 Delivery Address</h2>
     <div class="address-box">
@@ -125,53 +87,49 @@
     </div>
   </div>
 
-  <!-- PAYMENT -->
-<div class="card">
-  <h2>💳 Choose Payment Method</h2>
-
-  <!-- Card & Mobile Money via Flutterwave -->
-  <div class="payment-methods">
-    <div>
-      <input type="radio" name="payment_method" id="card"
-        value="card" class="payment-option" checked>
-      <label for="card" class="payment-label">
-        <span class="icon">💳</span> Card
-      </label>
+  <div class="card">
+    <h2>💳 Choose Payment Method</h2>
+    <div class="payment-methods">
+      <div>
+        <input type="radio" name="payment_method" id="card" value="card" class="payment-option" checked>
+        <label for="card" class="payment-label">
+          <span class="icon">💳</span> Card
+        </label>
+      </div>
+      <div>
+        <input type="radio" name="payment_method" id="mobile" value="mobilemoney" class="payment-option">
+        <label for="mobile" class="payment-label">
+          <span class="icon">📱</span> Mobile Money
+        </label>
+      </div>
+      <div>
+        <input type="radio" name="payment_method" id="cash" value="cash" class="payment-option">
+        <label for="cash" class="payment-label">
+          <span class="icon">💵</span> Cash
+        </label>
+      </div>
     </div>
-    <div>
-      <input type="radio" name="payment_method" id="mobile"
-        value="mobile_money" class="payment-option">
-      <label for="mobile" class="payment-label">
-        <span class="icon">📱</span> Mobile Money
-      </label>
-    </div>
-    <div>
-      <input type="radio" name="payment_method" id="cash"
-        value="cash" class="payment-option">
-      <label for="cash" class="payment-label">
-        <span class="icon">💵</span> Cash
-      </label>
-    </div>
-  </div>
 
-  <!-- Flutterwave pays card & mobile money -->
-  <div id="online-pay">
-    <button type="button" onclick="makePayment()" class="pay-btn">
-      Pay ${{ order.total_price }} Online 🔒
-    </button>
-  </div>
-
-  <!-- Cash on delivery -->
-  <div id="cash-pay" style="display:none;">
-    <form method="post" action="{% url 'process_payment' order.id %}">
-      {% csrf_token %}
-      <input type="hidden" name="payment_method" value="cash">
-      <button type="submit" class="pay-btn">
-        Confirm Cash on Delivery 💵
+    <div id="online-pay">
+      <button type="button" onclick="makePayment()" class="pay-btn">
+        Pay ${{ order.total_price }} Online 🔒
       </button>
-    </form>
+    </div>
+
+    <div id="cash-pay" style="display:none;">
+      <form method="post" action="{% url 'process_payment' order.id %}">
+        {% csrf_token %}
+        <input type="hidden" name="payment_method" value="cash">
+        <input type="hidden" name="phone" value="cash">
+        <button type="submit" class="pay-btn">Confirm Cash on Delivery 💵</button>
+      </form>
+    </div>
   </div>
 </div>
+
+<footer>
+  <p>© 2026 <span>FoodieExpress</span>. Made By JUICE999 ❤️ for food lovers.</p>
+</footer>
 
 <script src="https://checkout.flutterwave.com/v3.js"></script>
 <script>
@@ -197,6 +155,10 @@
   });
 
   function makePayment() {
+    if (!FW_PUBLIC_KEY) {
+      alert("Payment configuration error. Please contact support.");
+      return;
+    }
     FlutterwaveCheckout({
       public_key: FW_PUBLIC_KEY,
       tx_ref: ORDER_REF,
@@ -227,10 +189,6 @@
     });
   }
 </script>
-
-<footer>
-  <p>© 2026 <span>FoodieExpress</span>. Made By JUICE999 ❤️ for food lovers.</p>
-</footer>
 
 </body>
 </html>
