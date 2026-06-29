@@ -179,8 +179,22 @@
   <div class="order-sidebar">
     <h3>🛒 Your Order</h3>
     {% if user.is_authenticated %}
-      <textarea name="delivery_address" class="address-input" rows="3"
-        placeholder="Enter your delivery address..." required></textarea>
+      <input type="text" name="delivery_address" id="delivery_address"
+        class="address-input"
+        placeholder="Start typing your address in Arusha..."
+        required
+        autocomplete="off"
+        style="width:100%; padding:0.85rem 1rem; border:2px solid #eee;
+        border-radius:12px; font-size:0.95rem;
+        font-family:'Poppins',sans-serif;
+        margin-bottom:0.3rem; outline:none;">
+
+<div id="suggestions" style="background:white; border:1px solid #eee;
+  border-radius:12px; max-height:200px;
+  overflow-y:auto; display:none;
+  box-shadow:0 4px 15px rgba(0,0,0,0.1);
+  margin-bottom:1rem;">
+</div>
       <button type="submit" class="submit-btn" form="orderForm">Place Order 🚀</button>
       </form>
     {% else %}
@@ -231,6 +245,60 @@
     }
   }
 </script>
+<script>
+  var addressInput = document.getElementById('delivery_address');
+  var suggestionsDiv = document.getElementById('suggestions');
+  var searchTimeout;
 
+  addressInput.addEventListener('input', function() {
+    clearTimeout(searchTimeout);
+    var query = this.value;
+
+    if (query.length < 3) {
+      suggestionsDiv.style.display = 'none';
+      return;
+    }
+
+    searchTimeout = setTimeout(function() {
+      fetch('https://nominatim.openstreetmap.org/search?format=json&q='
+        + encodeURIComponent(query + ' Arusha Tanzania')
+        + '&limit=5&addressdetails=1')
+        .then(function(response) { return response.json(); })
+        .then(function(data) {
+          suggestionsDiv.innerHTML = '';
+          if (data.length === 0) {
+            suggestionsDiv.style.display = 'none';
+            return;
+          }
+          data.forEach(function(place) {
+            var item = document.createElement('div');
+            item.style.cssText = 'padding:0.8rem 1rem; cursor:pointer; border-bottom:1px solid #f5f5f5; font-size:0.9rem; color:#333;';
+            item.textContent = place.display_name;
+            item.addEventListener('mouseover', function() {
+              this.style.background = '#fff8f5';
+            });
+            item.addEventListener('mouseout', function() {
+              this.style.background = 'white';
+            });
+            item.addEventListener('click', function() {
+              addressInput.value = place.display_name;
+              suggestionsDiv.style.display = 'none';
+            });
+            suggestionsDiv.appendChild(item);
+          });
+          suggestionsDiv.style.display = 'block';
+        })
+        .catch(function() {
+          suggestionsDiv.style.display = 'none';
+        });
+    }, 500);
+  });
+
+  document.addEventListener('click', function(e) {
+    if (e.target !== addressInput) {
+      suggestionsDiv.style.display = 'none';
+    }
+  });
+</script>
 </body>
 </html>
