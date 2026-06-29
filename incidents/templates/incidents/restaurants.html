@@ -1,28 +1,8 @@
-from django.urls import path
-from . import views
-
-urlpatterns = [
-    # Auth
-    path('', views.home, name='home'),
-    path('register/', views.register, name='register'),
-    path('login/', views.user_login, name='login'),
-    path('logout/', views.user_logout, name='logout'),
-
-    # Restaurants
-    path('restaurants/', views.restaurant_list, name='restaurant_list'),
-    path('restaurants/<int:pk>/', views.restaurant_detail, name='restaurant_detail'),
-
-    # Orders
-    path('order/<int:restaurant_id>/', views.place_order, name='place_order'),
-    path('checkout/<int:order_id>/', views.checkout, name='checkout'),
-    path('payment/<int:order_id>/', views.process_payment, name='process_payment'),
-    path('track/<int:order_id>/', views.track_order, name='track_order'),
-    path('my-orders/', views.my_orders, name='my_orders'),
-]
-[3:45 AM, 6/25/2026] juice999: <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Restaurants - FoodieExpress</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;900&display=swap" rel="stylesheet">
   <style>
@@ -119,29 +99,28 @@ urlpatterns = [
 <nav>
   <a href="{% url 'home' %}" class="logo">Foodie<span>Express</span></a>
   <div class="nav-links">
-  <a href="{% url 'home' %}">Home</a>
-  <a href="{% url 'restaurant_list' %}">Restaurants</a>
-  {% if user.is_authenticated %}
-    <a href="{% url 'my_orders' %}">My Orders</a>
-    &nbsp;
-    <form method="post" action="{% url 'logout' %}" style="display:inline;">
-      {% csrf_token %}
-      <button type="submit" style="background:none; border:none;
-        color:white; font-family:'Poppins',sans-serif;
-        font-weight:600; font-size:0.95rem; cursor:pointer; padding:0;">
-        Logout ({{ user.username }})
-      </button>
-    </form>
-  {% else %}
-    <a href="{% url 'login' %}">Login</a>
-    <a href="{% url 'register' %}" class="nav-btn">Sign Up</a>
-  {% endif %}
-</div>
+    <a href="{% url 'home' %}">Home</a>
+    <a href="{% url 'restaurant_list' %}">Restaurants</a>
+    {% if user.is_authenticated %}
+      <a href="{% url 'my_orders' %}">My Orders</a>
+      <form method="post" action="{% url 'logout' %}" style="display:inline;">
+        {% csrf_token %}
+        <button type="submit" style="background:none; border:none; color:white;
+          font-family:'Poppins',sans-serif; font-weight:600;
+          font-size:0.95rem; cursor:pointer; padding:0; margin-left:1.5rem;">
+          Logout ({{ user.username }})
+        </button>
+      </form>
+    {% else %}
+      <a href="{% url 'login' %}">Login</a>
+      <a href="{% url 'register' %}" class="nav-btn">Sign Up</a>
+    {% endif %}
+  </div>
 </nav>
 
 <div class="page-hero">
   <h1>🍽️ All Restaurants</h1>
-  <p>Choose from our top-rated local restaurants</p>
+  <p>Choose from our top-rated local restaurants in Arusha</p>
 </div>
 
 <div class="container">
@@ -160,7 +139,9 @@ urlpatterns = [
               <span class="rating">⭐ {{ restaurant.rating }}</span>
               <span class="delivery-time">🕐 {{ restaurant.delivery_time }} mins</span>
             </div>
-            <a href="{% url 'restaurant_detail' restaurant.pk %}" class="order-link">View Menu & Order →</a>
+            <a href="{% url 'restaurant_detail' restaurant.pk %}" class="order-link">
+              View Menu & Order →
+            </a>
           </div>
         </div>
       {% endfor %}
@@ -168,7 +149,7 @@ urlpatterns = [
   {% else %}
     <div class="empty">
       <h3>No restaurants available yet</h3>
-      <p>Check back soon — we're adding more daily!</p>
+      <p>Check back soon — we are adding more daily!</p>
     </div>
   {% endif %}
 </div>
