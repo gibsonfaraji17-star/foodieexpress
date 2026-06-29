@@ -175,9 +175,7 @@
 
 <script src="https://checkout.flutterwave.com/v3.js"></script>
 <script>
-  // Store Django values in JS variables first
   var FW_PUBLIC_KEY = "{{ flutterwave_public_key }}";
-  console.log("key:", FW_PUBLIC_KEY);
   var ORDER_ID = "{{ order.id }}";
   var ORDER_AMOUNT = parseFloat("{{ order.total_price }}");
   var USER_EMAIL = "{{ request.user.email|default:'customer@foodieexpress.com' }}";
@@ -185,7 +183,6 @@
   var ORDER_REF = "foodie_order_" + ORDER_ID + "_" + Date.now();
   var selectedMethod = "card";
 
-  // Switch between cash and online
   document.querySelectorAll(".payment-option").forEach(function(radio) {
     radio.addEventListener("change", function() {
       selectedMethod = this.value;
@@ -226,47 +223,6 @@
       },
       onclose: function() {
         console.log("Payment popup closed");
-      }
-    });
-  }
-</script>
-  // Show/hide cash vs online payment
-  document.querySelectorAll('.payment-option').forEach(function(radio) {
-    radio.addEventListener('change', function() {
-      if (this.value === 'cash') {
-        document.getElementById('cash-pay').style.display = 'block';
-        document.getElementById('online-pay').style.display = 'none';
-      } else {
-        document.getElementById('cash-pay').style.display = 'none';
-        document.getElementById('online-pay').style.display = 'block';
-      }
-    });
-  });
-
-  function makePayment() {
-    FlutterwaveCheckout({
-      public_key: "{{ flutterwave_public_key }}",
-      tx_ref: "order_{{ order.id }}_" + Date.now(),
-      amount: {{ order.total_price }},
-      currency: "USD",
-      payment_options: "card, mobilemoney",
-      customer: {
-        email: "{{ request.user.email }}",
-        name: "{{ request.user.username }}",
-      },
-      customizations: {
-        title: "FoodieExpress",
-        description: "Payment for Order #{{ order.id }}",
-        logo: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=100",
-      },
-      callback: function(response) {
-        if (response.status === "successful") {
-          // Send confirmation to Django
-          window.location.href = "/payment/verify/{{ order.id }}/?tx_ref=" + response.tx_ref + "&transaction_id=" + response.transaction_id;
-        }
-      },
-      onclose: function() {
-        console.log("Payment cancelled");
       }
     });
   }
