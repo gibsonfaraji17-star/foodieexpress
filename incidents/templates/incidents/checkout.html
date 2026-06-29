@@ -177,6 +177,7 @@
 <script>
   // Store Django values in JS variables first
   var FW_PUBLIC_KEY = "{{ flutterwave_public_key }}";
+  console.log("key:", FW_PUBLIC_KEY);
   var ORDER_ID = "{{ order.id }}";
   var ORDER_AMOUNT = parseFloat("{{ order.total_price }}");
   var USER_EMAIL = "{{ request.user.email|default:'customer@foodieexpress.com' }}";

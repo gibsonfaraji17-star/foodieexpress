@@ -6,7 +6,7 @@ from django.contrib import messages
 from .models import Restaurant, MenuItem, Order, OrderItem, Payment, DeliveryTracking
 from decimal import Decimal
 import requests
-from django.conf import settings
+from django.conf import settings as django_settings
 
 
 # ---------- AUTH ----------
@@ -118,7 +118,7 @@ def checkout(request, order_id):
     order = get_object_or_404(Order, pk=order_id, user=request.user)
     return render(request, 'incidents/checkout.html', {
         'order': order,
-        'flutterwave_public_key': settings.FLUTTERWAVE_PUBLIC_KEY,
+        'flutterwave_public_key': django_settings.FLUTTERWAVE_PUBLIC_KEY,
     })
 
 
